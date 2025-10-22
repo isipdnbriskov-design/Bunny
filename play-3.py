@@ -1,7 +1,6 @@
 import random
 import time
 
-# ===== КОНСТАНТЫ И НАСТРОЙКИ =====
 LOCATIONS = {
     'дом': 'Ваш дом в посёлке. Здесь живёт ваша семья.',
     'школа': 'Старая школа, где учатся дети посёлка.',
@@ -18,7 +17,6 @@ CHARACTERS = {
     'медведь': 'Сильный парень в маске медведя.'
 }
 
-# ===== ИНИЦИАЛИЗАЦИЯ ИГРЫ =====
 def initialize_game():
     game_state = {
         'location': 'дом',
@@ -30,14 +28,12 @@ def initialize_game():
         'day': 1
     }
     
-    # Списки для хранения информации об исчезнувших детях
     missing_children = [
         {'имя': 'Сергей', 'возраст': 11, 'место': 'лес', 'время': 'вечер'},
         {'имя': 'Марина', 'возраст': 10, 'место': 'школа', 'время': 'день'},
         {'имя': 'Игорь', 'возраст': 12, 'место': 'площадь', 'время': 'ночь'}
     ]
     
-    # Словарь с зацепками (ключ - локация, значение - список зацепок)
     clues = {
         'лес': ['обрывок одежды на ветке', 'странные следы'],
         'школа': ['записка в парте', 'исчезнувший дневник'],
@@ -47,14 +43,12 @@ def initialize_game():
     
     return game_state, missing_children, clues
 
-# ===== ОСНОВНЫЕ ФУНКЦИИ =====
 def show_location(game_state):
     """Показать текущую локацию и её описание"""
     print(f"\n--- День {game_state['day']} ---")
     print(f"Вы находитесь: {game_state['location'].upper()}")
     print(LOCATIONS[game_state['location']])
     
-    # Добавляем локацию в посещенные
     game_state['visited_locations'].add(game_state['location'])
 
 def show_actions():
@@ -80,7 +74,7 @@ def move_location(game_state):
         if 0 <= choice < len(locations_list):
             new_location = locations_list[choice]
             game_state['location'] = new_location
-            game_state['day'] += 0.5  # Время проходит при перемещении
+            game_state['day'] += 0.5
             print(f"\nВы переместились в {new_location}...")
         else:
             print("Неверный выбор!")
@@ -92,7 +86,7 @@ def examine_location(game_state, clues):
     current_loc = game_state['location']
     
     if current_loc in clues and clues[current_loc]:
-        clue_found = clues[current_loc].pop(0)  # Убираем зацепку из доступных
+        clue_found = clues[current_loc].pop(0)
         game_state['inventory'].add(clue_found)
         
         if current_loc not in game_state['clues_found']:
@@ -101,7 +95,6 @@ def examine_location(game_state, clues):
         
         print(f"\nВы нашли зацепку: {clue_found}!")
         
-        # Проверка на переход на уровень 2
         if len(game_state['inventory']) >= 3 and game_state['level'] == 1:
             print("\n=== УРОВЕНЬ 2 ОТКРЫТ ===")
             print("Вы собрали достаточно зацепок! Теперь можно начать настоящее расследование.")
@@ -114,7 +107,6 @@ def talk_to_character(game_state):
     current_loc = game_state['location']
     available_chars = []
     
-    # Определяем доступных персонажей в зависимости от локации
     if current_loc == 'дом':
         available_chars = ['родители', 'оля']
     elif current_loc == 'лес':
@@ -147,7 +139,6 @@ def have_conversation(game_state, character):
     print(f"\n=== Разговор с {character} ===")
     
     if character in ['лиса', 'волк', 'медведь']:
-        # Диалоги с маскированными детьми
         if game_state['relationships'][character] < 2:
             print(f"{character.capitalize()}: 'Ты не должен быть здесь... Это опасно.'")
             if len(game_state['inventory']) > 0:
@@ -196,18 +187,15 @@ def analyze_clues(game_state, missing_children):
         print("У вас нет зацепок для анализа...")
         return
     
-    # Анализ закономерностей исчезновений
     locations_with_clues = set(game_state['clues_found'].keys())
     missing_locations = {child['место'] for child in missing_children}
     
     print("Проанализировав зацепки, вы обнаружили:")
     
-    # Находим совпадения локаций
     common_locations = locations_with_clues & missing_locations
     if common_locations:
         print(f"- Исчезновения происходят в: {', '.join(common_locations)}")
     
-    # Проверяем достаточно ли зацепок для решения
     if len(game_state['inventory']) >= 5:
         print("\n!!! ВАЖНОЕ ОТКРЫТИЕ !!!")
         print("Все зацепки ведут к заброшенному зданию!")
@@ -218,7 +206,7 @@ def analyze_clues(game_state, missing_children):
 
 def random_event(game_state, missing_children):
     """Случайные события в игре"""
-    if random.random() < 0.3:  # 30% шанс события
+    if random.random() < 0.3:  
         events = [
             "Вы слышите странные звуки из леса...",
             "Кто-то наблюдает за вами из темноты...",
@@ -229,7 +217,6 @@ def random_event(game_state, missing_children):
         print(f"\n[СЛУЧАЙНОЕ СОБЫТИЕ] {random.choice(events)}")
         time.sleep(2)
 
-# ===== ГЛАВНЫЙ ЦИКЛ ИГРЫ =====
 def main():
     print("=== ТАЁЖНЫЕ ТАЙНЫ ===")
     print("Добро пожаловать в таёжный посёлок 90-х!")
@@ -273,10 +260,8 @@ def main():
         except ValueError:
             print("Пожалуйста, введите число!")
         
-        # Проверка на случайное событие
         random_event(game_state, missing_children)
         
-        # Проверка на завершение дня
         if game_state['day'] % 1 == 0:
             print(f"\n--- Конец дня {int(game_state['day'])} ---")
             time.sleep(1)
